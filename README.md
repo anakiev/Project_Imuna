@@ -5,6 +5,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 Make sure have your env variables are configured.
 Your .env.local file should look like this:
 
+```bash
 GEMINI_API_KEY=YOUR_KEY
 
 #FIREBASE PROJECT:
@@ -16,7 +17,7 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=YOUR_BUCKET
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=YOUR_SENDER_ID
 NEXT_PUBLIC_FIREBASE_APP_ID=YOUR_FIREBASE_APP_ID
 MESUREMENTID=YOUR_MEASUREMENTID
-
+```
 
 
 First, run the development server:
