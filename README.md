@@ -2,7 +2,6 @@
 
 <img src="https://raw.githubusercontent.com/anakiev/Project_Imuna/main/src/app/icon.png" width="240" height="240">
 
-
 IMuNA is an application designed to assist with human-AI fact-checking. The app streamlines the fact-checking process by analyzing claims and generating AI-based evaluations. It provides an interactive workflow for users to extract, identify, and evaluate facts from their data.
 
 ## Features
