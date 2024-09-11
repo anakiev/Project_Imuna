@@ -12,6 +12,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Slide,
+  Grid,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import moment from 'moment';
@@ -21,6 +23,17 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { getMyProfile } from '../fetchData/getMyProfile';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { title } from 'process';
+import { TransitionProps } from '@mui/material/transitions';
+import Image from 'next/image';
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any>;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 interface ClaimData {
   claim: string;
@@ -41,11 +54,10 @@ const ImageContextPopup = ({
   open,
   onClose,
   onImportContext,
-}: // imageDialogOpen
-any) => {
+}: any) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [extractedContext, setExtractedContext] = useState('');
-  // const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [userEditedContext, setUserEditedContext] = useState('');
 
   const handleStartAnalysis = async () => {
     setIsAnalyzing(true);
@@ -62,10 +74,14 @@ any) => {
       const res = await response;
       try {
         const data = await res.json();
-        if (data.context) setExtractedContext(data.context);
+        if (data.context) {
+          setExtractedContext(data.context);
+          setUserEditedContext(data.context); // Initialize userEditedContext with extracted context
+        }
       } catch (error) {
         console.error('Error analyzing images:', error);
-        setExtractedContext(''); // Clear the context if there's an error
+        setExtractedContext('');
+        setUserEditedContext('');
       } finally {
         setIsAnalyzing(false);
       }
@@ -77,27 +93,57 @@ any) => {
   };
 
   const handleImportContext = () => {
-    onImportContext(extractedContext);
+    onImportContext(userEditedContext); // Use userEditedContext for import
     onClose();
   };
+
+  const handleContextChange = (event: any) => {
+    setUserEditedContext(event.target.value);
+  };
+
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog fullScreen open={open} onClose={onClose}>
       <DialogTitle>Extract Context from Images</DialogTitle>
       <DialogContent>
-        <LoadingButton
-          loading={isAnalyzing}
-          loadingPosition="start"
-          startIcon={<AutorenewIcon />}
-          variant="outlined"
-          onClick={handleStartAnalysis}
-        >
-          Start Analysis
-        </LoadingButton>
-        {extractedContext && (
-          <Box mt={2}>
-            <Typography variant="body1">{extractedContext}</Typography>
-          </Box>
-        )}
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            {/* Render images if available in articleData */}
+            <Stack direction={'column'}>
+              {images &&
+                images.map((image: any, index: any) => (
+                  <Image
+                    key={index}
+                    src={image}
+                    alt={`Image ${index}`}
+                    width={500}
+                    height={500}
+                  />
+                ))}
+              <LoadingButton
+                loading={isAnalyzing}
+                loadingPosition="start"
+                startIcon={<AutorenewIcon />}
+                variant="outlined"
+                onClick={handleStartAnalysis}
+              >
+                Start Analysis
+              </LoadingButton>
+            </Stack>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {extractedContext && (
+              <TextField
+                fullWidth
+                multiline
+                label="Extracted Context (Editable)"
+                value={userEditedContext}
+                onChange={handleContextChange}
+                variant="outlined"
+                margin="normal"
+              />
+            )}
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
@@ -108,7 +154,6 @@ any) => {
     </Dialog>
   );
 };
-
 const ClaimExtractor = ({
   data,
   projectId,
@@ -383,7 +428,7 @@ const ClaimExtractor = ({
                         handleClaimChange(
                           index,
                           'claim_types',
-                          e.target.value.split(', ').join(',')
+                          e.target.value.split(',').join(',')
                         )
                       }
                       fullWidth
@@ -455,9 +500,12 @@ const ClaimExtractor = ({
           </Card>
         ))}
       </Box>
-
       {/* Dialog for adding a new claim */}
-      <Dialog open={isAddingClaim} onClose={handleCloseAddClaimDialog}>
+      <Dialog
+        open={isAddingClaim}
+        onClose={handleCloseAddClaimDialog}
+        TransitionComponent={Transition}
+      >
         <DialogTitle>Add New Claim</DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
@@ -535,7 +583,7 @@ const ClaimExtractor = ({
               onChange={(e) =>
                 handleNewClaimChange(
                   'claim_types',
-                  e.target.value.split(', ').join(',')
+                  e.target.value.split(',').join(',')
                 )
               }
               fullWidth

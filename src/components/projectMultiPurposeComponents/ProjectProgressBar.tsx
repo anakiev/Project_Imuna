@@ -93,6 +93,7 @@ export default function ProjectProgressBar({
       alignItems="center"
       sx={{ width: '100%' }}
       justifyContent="space-evenly"
+      paddingTop={4}
     >
       {step != 1 ? (
         <div>

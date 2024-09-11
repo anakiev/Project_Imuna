@@ -10,7 +10,7 @@ import { getProjectData } from '@/components/fetchData/getProjectData';
 import React from 'react';
 import { usePathname } from 'next/navigation';
 
-export function extractProjectID(str: string) {
+function extractProjectID(str: string) {
   const regex = /\/projects\/([^\/]+)\/.*/;
   const match = str.match(regex);
   return match ? match[1] : '0';
@@ -26,6 +26,7 @@ export default function Home() {
   let userid = auth.currentUser?.uid || '';
   React.useEffect(() => {
     // Fetch article data based on the 'id'
+    userid = auth.currentUser?.uid || '';
     const fetchArticleData = async () => {
       try {
         let project = await getProjectData(userid, id);
@@ -42,10 +43,10 @@ export default function Home() {
         // Handle the error (e.g., show an error message)
       }
     };
-    if (!articleData || !claims) {
+    if (!articleData) {
       fetchArticleData();
     }
-  }, [auth, userid, id, claims]); // Fetch data whenever the 'id' changes
+  }, [articleData, auth, userid, id, claims]); // Fetch data whenever the 'id' changes
 
   const handleIndexChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newIndex = parseInt(event.target.value, 10);
@@ -66,7 +67,7 @@ export default function Home() {
     >
       <ProjectProgressBar step={3} stepProps={{}} />
       <TextField
-        sx={{ mt: 60 }}
+        sx={{ mt: 2 }}
         label="Filter Facts by Claim Index"
         type="number"
         value={selectedClaimIndex}
@@ -90,7 +91,11 @@ export default function Home() {
                     */
           claims={claims || []}
         />
-        <FactsList claims={claims} selectedClaimIndex={selectedClaimIndex} />
+        <FactsList
+          claims={claims}
+          selectedClaimIndex={selectedClaimIndex}
+          factsFinal={null}
+        />
       </Stack>
     </Stack>
   );

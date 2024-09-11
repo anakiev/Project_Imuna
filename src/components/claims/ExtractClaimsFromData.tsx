@@ -22,12 +22,12 @@ export default function ExtractClaimsFromData({ id }: { id: number }) {
     article_text: string;
     images: string[];
   } | null>(null); // State for article data
-  let userid = auth.currentUser?.uid || '';
+  // let userid = auth.currentUser?.uid || '';
   React.useEffect(() => {
     // Fetch article data based on the 'id'
     const fetchArticleData = async () => {
       try {
-        let project = await getProjectData(userid, id);
+        let project = await getProjectData(auth.currentUser?.uid, id);
         // console.log('project=' + JSON.stringify(project));
         let allImages = project.multimedia.map((image: any) => image.url);
         let article = {
@@ -43,7 +43,7 @@ export default function ExtractClaimsFromData({ id }: { id: number }) {
     };
 
     fetchArticleData();
-  }, [id]); // Fetch data whenever the 'id' changes
+  }, [id, auth.currentUser]); // Fetch data whenever the 'id' changes
   return (
     <Grid container paddingLeft={0} columnSpacing={{ xs: 2 }}>
       <Grid item xs={6} pl={15}>

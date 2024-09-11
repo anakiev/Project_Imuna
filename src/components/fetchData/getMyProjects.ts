@@ -15,11 +15,11 @@ import {
 	addDoc,
 	getFirestore,
 } from "firebase/firestore";
-import { db } from "@/lib/auth/clientApp";
-import { getAuthenticatedAppForUser } from '@/lib/auth/serverApp';
+import { auth, db } from "@/lib/auth/clientApp";
+// import { getAuthenticatedAppForUser } from '@/lib/auth/serverApp';
 
 export async function getMyProjects(db = db, filters = {}) {
-    const { currentUser } = await getAuthenticatedAppForUser();
+    const  currentUser  = auth.currentUser// await getAuthenticatedAppForUser();
     const usersRef = collection(db, "users");
     const q = query(usersRef, where("email", "==", currentUser?.email));
 	// q = applyQueryFilters(q, filters);

@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Button, Card, Stack, Typography, Collapse } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  Stack,
+  Typography,
+  Collapse,
+  Divider,
+} from '@mui/material';
 import moment from 'moment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -45,6 +53,7 @@ const ClaimsList = ({ claims }: { claims: ClaimData[] }) => {
 
                 {/* Display the main claim */}
                 <Typography variant="body1">{claim.claim}</Typography>
+                <Divider />
 
                 {/* Collapsible content for other claim details */}
                 <Collapse
@@ -59,24 +68,31 @@ const ClaimsList = ({ claims }: { claims: ClaimData[] }) => {
                         {moment(claim.claim_date).format('MMMM D, YYYY')}
                       </span>
                     </Typography>
+                    <Divider />
+
                     <Typography variant="body2">
                       Speaker:{' '}
                       <span style={{ color: 'text.secondary' }}>
                         {claim.speaker}
                       </span>
                     </Typography>
+                    <Divider />
+
                     {claim.original_claim_url && (
-                      <Typography variant="body2">
-                        Original URL:{' '}
-                        <a
-                          href={claim.original_claim_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: 'text.secondary' }}
-                        >
-                          {claim.original_claim_url}
-                        </a>
-                      </Typography>
+                      <>
+                        <Typography variant="body2">
+                          Original URL:{' '}
+                          <a
+                            href={claim.original_claim_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: 'text.secondary' }}
+                          >
+                            {claim.original_claim_url}
+                          </a>
+                        </Typography>
+                        <Divider />
+                      </>
                     )}
                     {/* ... Add more Typography components to display other fields as needed ... */}
                     <Typography variant="body2">
@@ -85,30 +101,39 @@ const ClaimsList = ({ claims }: { claims: ClaimData[] }) => {
                         {claim.cached_original_claim_url || 'N/A'}
                       </span>
                     </Typography>
+                    <Divider />
+
                     <Typography variant="body2">
                       Reporting Source:{' '}
                       <span style={{ color: 'text.secondary' }}>
                         {claim.reporting_source}
                       </span>
                     </Typography>
+                    <Divider />
+
                     <Typography variant="body2">
                       Location ISO Code:{' '}
                       <span style={{ color: 'text.secondary' }}>
                         {claim.location_ISO_code}
                       </span>
                     </Typography>
+                    <Divider />
+
                     <Typography variant="body2">
                       Source Medium:{' '}
                       <span style={{ color: 'text.secondary' }}>
                         {claim.source_medium}
                       </span>
                     </Typography>
+                    <Divider />
+
                     <Typography variant="body2">
                       Claim Types:{' '}
                       <span style={{ color: 'text.secondary' }}>
-                        {claim.claim_types.join(', ')}
+                        {claim.claim_types.join(',')}
                       </span>
                     </Typography>
+                    <Divider />
                   </Stack>
                 </Collapse>
 

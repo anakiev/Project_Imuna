@@ -1,68 +1,41 @@
-import Paper from '@mui/material/Paper';
-import React from 'react';
-import Head from 'next/head';
+'use client';
 
+import { useEffect, useState } from 'react';
 import {
   Box,
   Stack,
+  Paper,
   Typography,
+  Button,
   List,
   ListItem,
   ListItemText,
-  Button,
 } from '@mui/material';
 import Link from 'next/link';
-import { getAuthenticatedAppForUser } from '@/lib/auth/serverApp';
-import { getFirestore } from 'firebase/firestore';
+import { auth, db } from '@/lib/auth/clientApp';
 import { getMyProjects } from '@/components/fetchData/getMyProjects';
 
-export const dynamic = 'force-dynamic';
-const projectsOld = [
-  {
-    id: 1,
-    title: 'Putin chokes on a pretzel',
-    stage: 'Completed',
-    lastModified: '2023-06-01',
-  },
-  {
-    id: 2,
-    title: 'World governments unite to fight climate change',
-    stage: 'In Progress',
-    lastModified: '2023-06-10',
-  },
-  {
-    id: 3,
-    title: 'German scientists achieve cold fusion',
-    stage: 'Not Started',
-    lastModified: '2023-06-15',
-  },
-  {
-    id: 4,
-    title: 'Test123',
-    stage: 'Not Started',
-    lastModified: '2023-06-16',
-  },
-];
+export default function Home({ searchParams }: any) {
+  const [myProjects, setMyProjects] = useState<any>(null);
+  const [projects, setProjects] = useState<any>(null);
 
-/*
-function getProjects() {
-  return projects;
-}
-*/
-export default async function Home({ searchParams }: any) {
-  const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
-  let myProjects: any = null;
-  if (currentUser) {
-    myProjects = await getMyProjects(
-      getFirestore(firebaseServerApp),
-      searchParams
-    );
-  }
+  useEffect(() => {
+    const fetchMyProjects = async () => {
+      if (auth.currentUser) {
+        const projectsData = await getMyProjects(db, searchParams);
+        setMyProjects(projectsData);
+      }
+    };
 
-  let projects = null;
-  if (myProjects) {
-    projects = myProjects[0].projects;
-  }
+    fetchMyProjects();
+  }, [searchParams]); // Re-fetch projects if searchParams change
+
+  useEffect(() => {
+    if (myProjects && myProjects[0]) {
+      setProjects(myProjects[0].projects);
+    }
+  }, [myProjects]); // Update projects when myProjects changes
+
   return (
     <Box>
       <div>
@@ -89,27 +62,28 @@ export default async function Home({ searchParams }: any) {
               </Link>
             </Box>
             <List>
-              {projects?.map((project: any) => (
-                <ListItem
-                  key={project.id}
-                  sx={{ padding: 2, borderBottom: '1px solid #ddd' }}
-                >
-                  <Link
-                    href={`/projects/${project.projectId}/extractClaims`}
-                    passHref
+              {projects &&
+                projects?.map((project: any) => (
+                  <ListItem
+                    key={project.id}
+                    sx={{ padding: 2, borderBottom: '1px solid #ddd' }}
                   >
-                    <ListItemText
-                      primary={project.title}
-                      secondary={`Stage: ${project.stage} | Last Modified: ${project.lastModified}`}
-                      sx={{
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        color: 'inherit',
-                      }}
-                    />
-                  </Link>
-                </ListItem>
-              ))}
+                    <Link
+                      href={`/projects/${project.projectId}/extractClaims`}
+                      passHref
+                    >
+                      <ListItemText
+                        primary={project.title}
+                        // secondary={`Stage: ${project.stage} | Last Modified: ${project.lastModified}`}
+                        sx={{
+                          cursor: 'pointer',
+                          textDecoration: 'none',
+                          color: 'inherit',
+                        }}
+                      />
+                    </Link>
+                  </ListItem>
+                ))}
             </List>
           </Box>
         </Paper>

@@ -2,11 +2,12 @@
 import { doc, getDoc } from "firebase/firestore";
 
 import { db } from '@/lib/auth/clientApp';
-export async function getProjectData(userId: string, projectId: number){
+export async function getProjectData(userId: string | null | undefined, projectId: number){
     try {
       // Reference to the user document
       console.log('userId=' + userId);
-      if(!userId) userId = "ee1ss6V6gEWOFtRefTOufn11HR32";
+      if(!userId || userId == "") 
+        return null;
       const userRef = doc(db, "users", userId); 
 
       // Fetch the user document

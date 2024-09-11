@@ -68,7 +68,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 export default function TopBar() {
   const { mode, setMode } = useColorScheme();
   return (
-    <Box>
+    <Box paddingBottom={2}>
       <AppBar position="static">
         <Toolbar>
           <IconButton

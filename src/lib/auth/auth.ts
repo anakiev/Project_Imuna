@@ -21,7 +21,6 @@ import {
       console.error("Error signing in with Google", error);
     }
   }
-  
   export async function signOut() {
     try {
       return await auth.signOut();
@@ -29,7 +28,6 @@ import {
       console.error("Error signing out with Google", error);
     }
   }
-
   export async function signUpWithEmail(email: string, password: string, setloginError: any) {
 
     createUserWithEmailAndPassword(auth, email, password)

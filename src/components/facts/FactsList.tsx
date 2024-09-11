@@ -9,6 +9,7 @@ import {
   Stack,
   Typography,
   TextField,
+  Divider,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -17,9 +18,14 @@ import AddIcon from '@mui/icons-material/Add';
 import { auth, db } from '@/lib/auth/clientApp';
 // import { extractProjectID } from './utils';
 import { usePathname } from 'next/navigation';
-import { extractProjectID } from '@/app/projects/[id]/knowledgematching/page';
 import { getMyProfile } from '../fetchData/getMyProfile';
 import { doc, updateDoc } from 'firebase/firestore';
+
+function extractProjectID(str: string) {
+  const regex = /\/projects\/([^\/]+)\/.*/;
+  const match = str.match(regex);
+  return match ? match[1] : '0';
+}
 
 interface ClaimData {
   claim: string;
@@ -54,9 +60,11 @@ interface ApiResponse {
 const FactsList = ({
   claims,
   selectedClaimIndex,
+  factsFinal,
 }: {
   claims: ClaimData[];
   selectedClaimIndex: number;
+  factsFinal: FactData[] | null;
 }) => {
   const [facts, setFacts] = useState<FactData[] | undefined>();
   const [editingFactIndex, setEditingFactIndex] = useState<number | null>(null);
@@ -72,6 +80,158 @@ const FactsList = ({
   const pathname = usePathname();
   const projectId = extractProjectID(pathname);
   const userId = auth.currentUser?.uid || '';
+  if (factsFinal && factsFinal.length > 0) {
+    return (
+      <Stack direction="column" spacing={2}>
+        {factsFinal
+          ?.filter((fact, index) => {
+            if (selectedClaimIndex < 0) {
+              return true;
+            } else {
+              return fact.claimIndex == selectedClaimIndex;
+            }
+          })
+
+          .map((fact, index) => (
+            <Card variant="outlined" sx={{ maxWidth: 650, mb: 2 }} key={index}>
+              <Box sx={{ p: 2 }}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  spacing={2}
+                >
+                  <Typography gutterBottom variant="h6" component="div">
+                    {`Fact ${index + 1}`}
+                  </Typography>
+                  <Divider />
+                  <Stack direction="row" spacing={1}>
+                    {editingFactIndex === index ? (
+                      <IconButton
+                        aria-label="Save fact"
+                        onClick={() => handleSaveFact(index)}
+                      >
+                        <SaveIcon />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        aria-label="Edit fact"
+                        onClick={() => handleEditFact(index)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    )}
+                    <IconButton
+                      aria-label="Delete fact"
+                      onClick={() => handleDeleteFact(index)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Stack>
+                </Stack>
+
+                {editingFactIndex === index ? (
+                  <>
+                    <TextField
+                      label="Question"
+                      defaultValue={fact.question}
+                      fullWidth
+                      margin="normal"
+                    />
+                    <Divider />
+                  </>
+                ) : (
+                  <>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      Question: {fact.question}
+                    </Typography>
+
+                    <Divider />
+                  </>
+                )}
+                {fact.answers.map((answer: any, answerIndex: any) => (
+                  <Box key={answerIndex} sx={{ mt: 1 }}>
+                    {editingFactIndex === index ? (
+                      <>
+                        <TextField
+                          label="Answer"
+                          defaultValue={answer.answer}
+                          fullWidth
+                          margin="normal"
+                        />
+                        <Divider />
+
+                        <TextField
+                          label="Answer Type"
+                          defaultValue={answer.answer_type}
+                          fullWidth
+                          margin="normal"
+                        />
+                        <Divider />
+
+                        <TextField
+                          label="Source"
+                          defaultValue={answer.source_url}
+                          fullWidth
+                          margin="normal"
+                        />
+                        <Divider />
+
+                        <TextField
+                          label="Cached Source URL"
+                          defaultValue={answer.cached_source_url}
+                          fullWidth
+                          margin="normal"
+                        />
+                        <Divider />
+
+                        <TextField
+                          label="Source Medium"
+                          defaultValue={answer.source_medium}
+                          fullWidth
+                          margin="normal"
+                        />
+                        <Divider />
+                      </>
+                    ) : (
+                      <>
+                        <Typography variant="body2">
+                          Answer: {answer.answer}
+                        </Typography>
+                        <Divider />
+
+                        <Typography
+                          variant="body2"
+                          sx={{ fontStyle: 'italic' }}
+                        >
+                          Answer Type: {answer.answer_type}
+                        </Typography>
+                        <Divider />
+
+                        <Typography variant="body2">
+                          Source: {answer.source_url}
+                        </Typography>
+                        <Divider />
+
+                        <Typography variant="body2">
+                          Cached Source URL: {answer.cached_source_url}
+                        </Typography>
+                        <Divider />
+
+                        <Typography variant="body2">
+                          Source Medium: {answer.source_medium}
+                        </Typography>
+                        <Divider />
+                      </>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            </Card>
+          ))}
+      </Stack>
+    );
+  }
 
   const handleFindFacts = async () => {
     setIsLoading(true);
